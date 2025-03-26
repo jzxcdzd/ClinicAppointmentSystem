@@ -1,9 +1,20 @@
 <html>
     <head>
-        <title> Hello World </title>
+        <title>Hello World</title>
+        <!-- Bootstrap CSS CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Link to external CSS -->
+        <link rel="stylesheet" href="../css/index.css">
     </head>
     <body>
-        <h1> Hello World </h1>
-        <p> Initial coomit </p>
+        <div class="container mt-4 text-center">
+            <div class="d-flex flex-column align-items-center">
+                <button type="button" class="btn btn-primary btn-lg appointment-btn mb-3" onclick="window.location.href='patient_login.html';">I want to make an appointment.</button>
+                <button type="button" class="btn btn-secondary physician-btn">I am a physician.</button>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS (optional) & dependencies -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
