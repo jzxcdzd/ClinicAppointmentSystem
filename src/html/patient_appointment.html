@@ -1,3 +1,12 @@
+<!--
+TODO: implement debug tables
+- table for past appointments
+- table for physician list
+
+use this table for data instead of predefined values
+replace with database code when available
+-->
+
 <html>
     <head>
         <title>Patient Appointment</title>
@@ -51,14 +60,7 @@
                     <div class="modal-body">
                         <p>Please note that incomplete forms and appointments outside of schedule hours will not be entertained.</p>
                         <form id="appointmentForm">
-                            <div class="mb-3">
-                                <label for="appointmentDate" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="appointmentDate" name="appointmentDate">
-                            </div>
-                            <div class="mb-3">
-                                <label for="appointmentTime" class="form-label">Time</label>
-                                <input type="time" class="form-control" id="appointmentTime" name="appointmentTime">
-                            </div>
+                            <!-- Physician-in-charge moved to the top -->
                             <div class="mb-3">
                                 <label for="physician" class="form-label">Physician-in-charge</label>
                                 <select class="form-select" id="physician" name="physician">
@@ -68,6 +70,14 @@
                                     <option value="3">Dr. Santiago</option>
                                 </select>
                                 <div id="scheduleDisplay" class="mt-2"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="appointmentDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="appointmentDate" name="appointmentDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="appointmentTime" class="form-label">Time</label>
+                                <input type="time" class="form-control" id="appointmentTime" name="appointmentTime">
                             </div>
                             <div class="mb-3">
                                 <label for="chiefConcern" class="form-label">Chief Concern</label>
@@ -82,7 +92,11 @@
             </div>
         </div>
 
-        <script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module">
+            import { PhysicianDB } from '../js/physicianDb.js';
+            console.log(PhysicianDB.getAll());
+
             // Retrieve firstName and lastName from URL query parameters
             const params = new URLSearchParams(window.location.search);
             const firstName = params.get('firstName');
@@ -95,106 +109,90 @@
                 greetingElem.textContent = 'Good day!';
             }
         
-            // Listen for changes on the physician selection and display schedule text.
+            // Populate physician dropdown with data from physicianDb.js
             const physicianSelect = document.getElementById('physician');
             const scheduleDisplay = document.getElementById('scheduleDisplay');
         
-            physicianSelect.addEventListener('change', function() {
-                switch(this.value) {
-                    case '1':
-                        scheduleDisplay.innerHTML = `
-                            Schedules:<br>
-                            - MON 08:00 - 17:00<br>
-                            - TUE 08:00 - 17:00<br>
-                            - WED 08:00 - 17:00<br>
-                            - THU 08:00 - 17:00<br>
-                            - FRI 08:00 - 17:00<br>
-                            - SAT 08:00 - 17:00<br>
-                            - SUN 08:00 - 17:00
-                            `;
-                        break;
-                    case '2':
-                        scheduleDisplay.innerHTML = `
-                            Schedules:<br>
-                            - MON 08:00 - 17:00<br>
-                            - TUE 08:00 - 17:00<br>
-                            - WED 08:00 - 17:00<br>
-                            - THU 08:00 - 17:00<br>
-                            - FRI 08:00 - 17:00<br>
-                            - SAT 08:00 - 17:00<br>
-                            - SUN 08:00 - 17:00
-                            `;                        break;
-                    case '3':
-                        scheduleDisplay.innerHTML = `
-                            Schedules:<br>
-                            - MON 08:00 - 17:00<br>
-                            - TUE 08:00 - 17:00<br>
-                            - WED 08:00 - 17:00<br>
-                            - THU 08:00 - 17:00<br>
-                            - FRI 08:00 - 17:00<br>
-                            - SAT 08:00 - 17:00<br>
-                            - SUN 08:00 - 17:00
-                            `;                        break;
-                    default:
-                        scheduleDisplay.textContent = "";
-                        break;
-                }
+            // Clear any existing options (like "Choose...")
+            physicianSelect.innerHTML = '<option selected value="">Choose...</option>';
+        
+            // Fill the dropdown from the physicians array
+            PhysicianDB.getAll().forEach((phys) => {
+                const option = document.createElement('option');
+                option.value = phys.id;
+                option.textContent = phys.name;
+                physicianSelect.appendChild(option);
             });
+        
+            // Listen for changes on the physician selection and display schedule text from physicianDb.js
+            physicianSelect.addEventListener('change', function() {
+                // Get selected physician with validation
+                const selectedPhys = PhysicianDB.getById(parseInt(this.value));
+                if (!selectedPhys) {
+                    scheduleDisplay.textContent = 'Physician not found';
+                    return;
+                }
 
-            // limit dates to today and future dates only
+                // Display schedule information
+                let scheduleText = '<strong>Availability:</strong><br>';
+                Object.entries(selectedPhys.schedule).forEach(([day, details]) => {
+                    if (details.available) {
+                        scheduleText += `- ${day}: ${details.hours.start} - ${details.hours.end}<br>`;
+                    } else {
+                        scheduleText += `- ${day}: Unavailable<br>`;
+                    }
+                });
+                scheduleDisplay.innerHTML = scheduleText;
+            });
+        
+            // Limit dates to today and future dates only
             const appointmentDateInput = document.getElementById('appointmentDate');
             const today = new Date().toISOString().split("T")[0];
             appointmentDateInput.min = today;
-            
-            // submission
+        
+            // Submission handler
             document.getElementById("appointmentForm").addEventListener("submit", function(event){
-            event.preventDefault();
-            
-            // Retrieve values from the form inputs
-            const appointmentDateInput = document.getElementById('appointmentDate');
-            const appointmentTimeInput = document.getElementById('appointmentTime');
-            const physicianSelect = document.getElementById('physician');
-            const chiefConcernInput = document.getElementById('chiefConcern');
-            
-            // Validate that all required fields are filled (physician must not be empty)
-            if (!appointmentDateInput.value || !appointmentTimeInput.value || !physicianSelect.value || !chiefConcernInput.value.trim()){
-                alert("Please fill in all fields.");
-                return;
-            }
-            
-            // Generate an appointment ID (this example uses timestamp)
-            const appointmentID = Date.now();
-            
-            // Retrieve the physician name from the select options
-            const physicianText = physicianSelect.options[physicianSelect.selectedIndex].text;
-            
-            // Get the table body element and create a new row with the form data
-            const tbody = document.querySelector("table.table tbody");
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>${appointmentID}</td>
-                <td>${appointmentDateInput.value}</td>
-                <td>${appointmentTimeInput.value}</td>
-                <td>${physicianText}</td>
-                <td>N/A</td>
-                <td>${chiefConcernInput.value}</td>
-                <td></td>
-            `;
-            tbody.appendChild(newRow);
-            
-            // Reset the form and clear the schedule display
-            event.target.reset();
-            document.getElementById("scheduleDisplay").textContent = "";
-            
-            // Hide the modal using Bootstrap's Modal API
-            const appointmentModalEl = document.getElementById("appointmentModal");
-            const modalInstance = bootstrap.Modal.getInstance(appointmentModalEl);
-            modalInstance.hide();
-        });
-
+                event.preventDefault();
+        
+                // Retrieve values from the form inputs
+                const appointmentTimeInput = document.getElementById('appointmentTime');
+                const chiefConcernInput = document.getElementById('chiefConcern');
+        
+                // Validate that all required fields are filled
+                if (!appointmentDateInput.value || !appointmentTimeInput.value || !physicianSelect.value || !chiefConcernInput.value.trim()){
+                    alert("Please fill in all fields.");
+                    return;
+                }
+        
+                // Generate an appointment ID
+                const appointmentID = Date.now();
+        
+                // Retrieve the physician name from the select options
+                const physicianText = physicianSelect.options[physicianSelect.selectedIndex].text;
+        
+                // Get the table body element and create a new row with the form data
+                const tbody = document.querySelector("table.table tbody");
+                const newRow = document.createElement("tr");
+                newRow.innerHTML = `
+                    <td>${appointmentID}</td>
+                    <td>${appointmentDateInput.value}</td>
+                    <td>${appointmentTimeInput.value}</td>
+                    <td>${physicianText}</td>
+                    <td>N/A</td>
+                    <td>${chiefConcernInput.value}</td>
+                    <td></td>
+                `;
+                tbody.appendChild(newRow);
+        
+                // Reset the form and clear the schedule display
+                event.target.reset();
+                scheduleDisplay.textContent = "";
+        
+                // Hide the modal using Bootstrap's Modal API
+                const appointmentModalEl = document.getElementById("appointmentModal");
+                const modalInstance = bootstrap.Modal.getInstance(appointmentModalEl);
+                modalInstance.hide();
+            });
         </script>
-
-        <!-- Bootstrap JS (optional) & dependencies -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
