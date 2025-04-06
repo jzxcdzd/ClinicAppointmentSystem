@@ -1,0 +1,61 @@
+<!--
+
+PHYSICIAN LOGIN PAGE
+contains the form for physician login info
+info will be cross-checked with the database
+
+if credentials match what's stored in the database:
+email && password
+the physician will be logged in
+
+clicking submit will take you to physician_dashboard.html
+
+-->
+
+<html>
+    <head>
+        <title>Physician Login</title>
+        <!-- Bootstrap CSS CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Link to external CSS -->
+        <link rel="stylesheet" href="../css/index.css">
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h1 class="text-center mb-4">Physician Login</h1>
+            <p style="font-size:12px;">
+                Note: <br>
+                Please enter your credentials to access the physician portal.
+                If you don't have an account yet, please contact the clinic administrator.
+                <br>
+                
+            </p>
+            <form>
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">Clinic ID Number</label>
+                    <input type="text" class="form-control" id="firstName">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <div class="d-grid">
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                    <br>
+                </div>
+                <div class="d-grid">
+                    <a href="index.html" class="btn btn-primary btn-lg">Back to Home</a>
+                </div>
+                <div class="text-center mt-3">
+                <i>
+                    <a href="index.html" class="btn btn-link">Not Registered? Contact Admin</a>
+                </i>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS (optional) & dependencies -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
