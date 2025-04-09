@@ -8,6 +8,7 @@ const initialPhysicianData = [
         specialty: "Cardiology",
         image: "",
         bio: "Board-certified cardiologist with 10+ years of experience.",
+        contact: "0967-420-6969",
         schedule: {
             Monday: { available: true, hours: { start: "09:00", end: "17:00" } },
             Tuesday: { available: false, hours: null },
@@ -24,6 +25,7 @@ const initialPhysicianData = [
         specialty: "Pediatrics",
         image: "",
         bio: "Pediatrician specializing in child development.",
+        contact: "0967-420-6969",
         schedule: {
             Monday: { available: true, hours: { start: "09:00", end: "17:00" } },
             Tuesday: { available: true, hours: { start: "08:00", end: "16:00" } },
@@ -40,6 +42,7 @@ const initialPhysicianData = [
         specialty: "Neurology",
         image: "",
         bio: "Neurologist focusing on migraine treatment.",
+        contact: "0967-420-6969",
         schedule: {
             Monday: { available: true, hours: { start: "09:00", end: "17:00" } },
             Tuesday: { available: false, hours: null },

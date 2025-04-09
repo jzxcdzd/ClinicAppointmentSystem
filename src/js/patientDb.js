@@ -7,7 +7,7 @@ const initialPatientData = [
             middle: "F",
             last: "Custodio"
         },
-        birthdate: "1998-10-12",
+        birthdate: "2025-04-10",
         sex: "male",
         address: "de lozolle",
         mobile: "555-1234",

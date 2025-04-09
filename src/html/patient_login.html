@@ -82,6 +82,9 @@ clicking submit will take you to patient_appointment.html
                     <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </form>
+            <div class="text-center">
+                <button type="button" id="debugSkipLogin" class="btn btn-danger btn-skiplgn" onclick="skipLogin();">Debug: Skip Log In</button>
+            </div>
         </div>
 
         <!-- Bootstrap JS (optional) & dependencies -->
@@ -154,6 +157,17 @@ clicking submit will take you to patient_appointment.html
                     window.location.href = `patient_appointment.html?${params.toString()}`;
                 }
             });
+
+            function skipLogin() {
+                const params = new URLSearchParams({
+                    firstName: 'Jose Miguel',
+                    lastName: 'Custodio',
+                    patientId: 1
+                });
+                window.location.href = `patient_appointment.html?${params.toString()}`;
+            }
+            window.skipLogin = skipLogin;
+
         </script>
     </body>
 </html>
