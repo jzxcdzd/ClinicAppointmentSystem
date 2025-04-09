@@ -10,15 +10,20 @@
     </head>
     <body>
         <div class="container mt-4">
-            <h1 id="greeting" class="text-center mb-4"></h1>
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <h1 id="greeting" class="mb-0"></h1>
+            </div>
             <p class="text-center">Your upcoming appointments and patient details will be displayed here.</p>
-            <div class="d-flex justify-content-center mt-3">
+            <div class="d-flex justify-content-center gap-3 mt-3">
                 <!-- Button triggers the modal -->
                 <button type="button"
                         class="btn btn-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#appointmentModal">
                     Add New Appointment
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPhysicianModal">
+                    <i class="bi bi-pencil-square"></i> Edit Information
                 </button>
             </div>
             <div class="table-responsive mt-4">
@@ -87,6 +92,66 @@
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Save Appointment</button>                            
                                 <button type="button" class="btn btn-danger" id="deleteAppointmentButton" style="display: none;">Delete Appointment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for editing physician information -->
+        <div class="modal fade" id="editPhysicianModal" tabindex="-1" aria-labelledby="editPhysicianModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPhysicianModalLabel">Edit Physician Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="physicianInfoForm">
+                            <div class="mb-3">
+                                <label for="physicianName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="physicianName" name="physicianName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="physicianSpecialty" class="form-label">Specialty</label>
+                                <select class="form-select" id="physicianSpecialty" name="physicianSpecialty" required>
+                                    <option value="Cardiology">Cardiology</option>
+                                    <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Neurology">Neurology</option>
+                                    <option value="Dermatology">Dermatology</option>
+                                    <option value="Orthopedics">Orthopedics</option>
+                                    <option value="General Medicine">General Medicine</option>
+                                    <option value="Gynecology">Gynecology</option>
+                                    <option value="Ophthalmology">Ophthalmology</option>
+                                    <option value="Psychiatry">Psychiatry</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="physicianBio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="physicianBio" name="physicianBio" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="physicianContact" class="form-label">Contact Number</label>
+                                <input type="text" class="form-control" id="physicianContact" name="physicianContact" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Weekly Schedule</label>
+                                <div class="schedule-container">
+                                    <!-- Schedule inputs will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="physicianUsername" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="physicianUsername" name="physicianUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="physicianPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="physicianPassword" name="physicianPassword" placeholder="Leave blank to keep current password">
+                                <div class="form-text">Enter a new password only if you want to change it.</div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
                         </form>
                     </div>
@@ -352,6 +417,141 @@
             }
         
             loadAppointments();
+
+            // Handle the physician info edit modal
+            const physicianInfoForm = document.getElementById("physicianInfoForm");
+            const scheduleContainer = document.querySelector(".schedule-container");
+            
+            // Function to load physician info into the form
+            function loadPhysicianInfo() {
+                const physician = PhysicianDB.getById(physicianId);
+                if (!physician) return;
+                
+                // Populate form fields with physician data
+                document.getElementById("physicianName").value = physician.name;
+                document.getElementById("physicianSpecialty").value = physician.specialty;
+                document.getElementById("physicianBio").value = physician.bio || '';
+                document.getElementById("physicianContact").value = physician.contact;
+                document.getElementById("physicianUsername").value = physician.username;
+                
+                // Reset schedule container
+                scheduleContainer.innerHTML = '';
+                
+                // Create schedule inputs for each day of the week
+                const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                
+                daysOfWeek.forEach(day => {
+                    const daySchedule = physician.schedule[day] || { available: false, hours: { start: '09:00', end: '17:00' } };
+                    
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'card mb-2';
+                    dayDiv.innerHTML = `
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">${day}</h6>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="available-${day}" 
+                                        ${daySchedule.available ? 'checked' : ''}>
+                                    <label class="form-check-label" for="available-${day}">Available</label>
+                                </div>
+                            </div>
+                            <div class="row schedule-hours ${!daySchedule.available ? 'd-none' : ''}">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Start Time</label>
+                                    <input type="time" class="form-control form-control-sm" id="start-${day}" 
+                                        value="${daySchedule.hours?.start || '09:00'}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">End Time</label>
+                                    <input type="time" class="form-control form-control-sm" id="end-${day}" 
+                                        value="${daySchedule.hours?.end || '17:00'}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    scheduleContainer.appendChild(dayDiv);
+                    
+                    // Add event listener for the availability toggle
+                    const availableCheckbox = dayDiv.querySelector(`#available-${day}`);
+                    const scheduleHours = dayDiv.querySelector('.schedule-hours');
+                    
+                    availableCheckbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            scheduleHours.classList.remove('d-none');
+                        } else {
+                            scheduleHours.classList.add('d-none');
+                        }
+                    });
+                });
+            }
+            
+            // Handle form submission for updating physician info
+            physicianInfoForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                
+                const name = document.getElementById("physicianName").value.trim();
+                const specialty = document.getElementById("physicianSpecialty").value;
+                const bio = document.getElementById("physicianBio").value.trim();
+                const contact = document.getElementById("physicianContact").value.trim();
+                const username = document.getElementById("physicianUsername").value.trim();
+                const password = document.getElementById("physicianPassword").value;
+                
+                // Validate required fields
+                if (!name || !specialty || !contact || !username) {
+                    alert("Please fill in all required fields.");
+                    return;
+                }
+                
+                // Build the updated schedule object
+                const schedule = {};
+                const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                
+                daysOfWeek.forEach(day => {
+                    const availableCheckbox = document.getElementById(`available-${day}`);
+                    const startTime = document.getElementById(`start-${day}`).value;
+                    const endTime = document.getElementById(`end-${day}`).value;
+                    
+                    schedule[day] = {
+                        available: availableCheckbox.checked,
+                        hours: availableCheckbox.checked ? { start: startTime, end: endTime } : null
+                    };
+                });
+                
+                // Build the updated physician object
+                const updatedPhysician = {
+                    name,
+                    specialty,
+                    bio,
+                    contact,
+                    username,
+                    schedule
+                };
+                
+                // If a new password was provided, update it as well
+                if (password) {
+                    updatedPhysician.password = password;
+                }
+                
+                // Update the physician in the database
+                const updated = PhysicianDB.update(physicianId, updatedPhysician);
+                
+                if (updated) {
+                    alert("Physician information updated successfully!");
+                    // Update greeting with new name
+                    greetingElement.textContent = `Welcome, ${name}!`;
+                    // Close the modal
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById("editPhysicianModal"));
+                    modalInstance.hide();
+                } else {
+                    alert("Failed to update physician information.");
+                }
+            });
+            
+            // Add event listener for when the edit modal is shown
+            document.getElementById('editPhysicianModal').addEventListener('show.bs.modal', function() {
+                loadPhysicianInfo();
+            });
         </script>
     </body>
 </html>
