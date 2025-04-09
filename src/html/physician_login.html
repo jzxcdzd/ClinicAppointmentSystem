@@ -1,17 +1,3 @@
-<!--
-
-PHYSICIAN LOGIN PAGE
-contains the form for physician login info
-info will be cross-checked with the database
-
-if credentials match what's stored in the database:
-email && password
-the physician will be logged in
-
-clicking submit will take you to physician_dashboard.html
-
--->
-
 <html>
     <head>
         <title>Physician Login</title>
@@ -29,20 +15,19 @@ clicking submit will take you to physician_dashboard.html
                 If you don't have an account yet, please contact the clinic administrator.
                 <br>
             </p>
-            <form id="loginForm">
+            <form id="physicianLoginForm">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required>
+                    <input type="text" class="form-control" id="username" name="username" required>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" required>
+                    <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg">Login</button>
-                    <br>
                 </div>
-                <div class="d-grid">
+                <div class="d-grid mt-2">
                     <a href="index.html" class="btn btn-primary btn-lg">Back to Home</a>
                 </div>
                 <div class="text-center mt-3">
@@ -52,42 +37,47 @@ clicking submit will take you to physician_dashboard.html
                 </div>
             </form>
         </div>
+        <div class="text-center">
+            <button type="button" id="debugSkipLogin" class="btn btn-danger btn-skiplgn" onclick="skipLogin();">Debug: Skip Log In</button>
+        </div>
 
         <!-- Bootstrap JS (optional) & dependencies -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module">
+            import { PhysicianDB } from '../js/physicianDb.js';
 
-                <script type="module">
-            import { initializePhysiciansDb, PhysicianDB } from '../js/physicianDb.js';
-        
-            // Initialize the mock database
-            initializePhysiciansDb();
-        
-            // Add event listener to the login form
-            document.getElementById('loginForm').addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent form submission
-        
+            document.getElementById('physicianLoginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Get form values
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value.trim();
-        
+
                 // Validate credentials
-                const physicians = PhysicianDB.getAll();
-                const physician = physicians.find(p => p.username === username && p.password === password);
-        
-                if (physician) { // Successful login
-                    alert(`Welcome, ${physician.name}!`);
-                    
-                    // Pass physician details as query parameters
+                const physician = PhysicianDB.getAll().find(
+                    (phys) => phys.username === username && phys.password === password
+                );
+
+                if (physician) {
+                    // Valid credentials
+                    alert('Login successful! Redirecting to dashboard...');
                     const params = new URLSearchParams({
-                        physicianId: physician.id,
-                        name: physician.name
+                        physicianId: physician.id
                     });
-                    window.location.href = `physician_appointment.html?${params.toString()}`;
-                } else { // Invalid credentials
+                    window.location.href = `physician_dashboard.html?${params.toString()}`;
+                } else {
+                    // Invalid credentials
                     alert('Invalid username or password. Please try again.');
                 }
             });
-        </script>
 
+            function skipLogin() {
+                const params = new URLSearchParams({
+                    physicianId: 1
+                });
+                window.location.href = `physician_dashboard.html?${params.toString()}`;
+            }
+            window.skipLogin = skipLogin;
         </script>
     </body>
 </html>

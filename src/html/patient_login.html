@@ -150,8 +150,6 @@ clicking submit will take you to patient_appointment.html
         
                     alert('New patient registered! Redirecting to appointment page...');
                     const params = new URLSearchParams({
-                        firstName: addedPatient.name.first,
-                        lastName: addedPatient.name.last,
                         patientId: addedPatient.id
                     });
                     window.location.href = `patient_appointment.html?${params.toString()}`;
@@ -160,8 +158,6 @@ clicking submit will take you to patient_appointment.html
 
             function skipLogin() {
                 const params = new URLSearchParams({
-                    firstName: 'Jose Miguel',
-                    lastName: 'Custodio',
                     patientId: 1
                 });
                 window.location.href = `patient_appointment.html?${params.toString()}`;

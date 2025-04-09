@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Patient Appointment</title>
+        <title>Physician Dashboard</title>
         <!-- Bootstrap CSS CDN -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Link to external CSS -->
@@ -9,14 +9,14 @@
     <body>
         <div class="container mt-4">
             <h1 id="greeting" class="text-center mb-4"></h1>
-            <p class="text-center">Your past and upcoming appointments will be displayed here.</p>
+            <p class="text-center">Your upcoming appointments and patient details will be displayed here.</p>
             <div class="d-flex justify-content-center mt-3">
                 <!-- Button triggers the modal -->
                 <button type="button"
                         class="btn btn-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#appointmentModal">
-                    Request for an Appointment
+                    Add New Appointment
                 </button>
             </div>
             <div class="table-responsive mt-4">
@@ -26,9 +26,9 @@
                             <th class="col-id">ID</th>
                             <th class="col-date">Date</th>
                             <th class="col-time">Time</th>
-                            <th class="col-physician">Physician-in-charge</th>
+                            <th class="col-patient">Patient Name</th>
                             <th class="col-contact">Contact #</th>
-                            <th class="col-chief-concern">Chief concern</th>
+                            <th class="col-chief-concern">Chief Concern</th>
                             <th class="col-notes">Notes</th>
                         </tr>
                     </thead>
@@ -44,39 +44,39 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="appointmentModalLabel">Request Appointment</h5>
+                        <h5 class="modal-title" id="appointmentModalLabel">Add Appointment</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="appointmentForm">
                             <input type="hidden" id="appointmentId" name="appointmentId">
-                            <div class="mb-2">
-                                <label for="physician" class="form-label">Physician-in-charge</label>
-                                <select class="form-select" id="physician" name="physician">
-                                    <option selected>Choose...</option>
-                                    <option value="1">Dr. Algarra</option>
-                                    <option value="2">Dr. Macariola</option>
-                                    <option value="3">Dr. Santiago</option>
-                                </select>
-                                <div id="scheduleDisplay" class="mt-2"></div>
+                            <div class="row mb-2">
+                                <div class="col-md-10">
+                                    <label for="patientName" class="form-label">Patient Name</label>
+                                    <input type="text" class="form-control" id="patientName" name="patientName" readonly>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="patientId" class="form-label">ID</label>
+                                    <input type="text" class="form-control" id="patientId" name="patientId" required>
+                                </div>
                             </div>
                             <div class="mb-2">
-                                <label for="physicianContact" class="form-label">Physician Contact #</label>
-                                <input type="text" class="form-control" id="physicianContact" name="physicianContact">
+                                <label for="patientContact" class="form-label">Patient Contact</label>
+                                <input type="text" class="form-control" id="patientContact" name="patientContact" readonly required>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-6">
                                     <label for="appointmentDate" class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="appointmentDate" name="appointmentDate">
+                                    <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="appointmentTime" class="form-label">Time</label>
-                                    <input type="time" class="form-control" id="appointmentTime" name="appointmentTime">
+                                    <input type="time" class="form-control" id="appointmentTime" name="appointmentTime" required>
                                 </div>
                             </div>
                             <div class="mb-2">
                                 <label for="chiefConcern" class="form-label">Chief Concern</label>
-                                <textarea class="form-control" id="chiefConcern" name="chiefConcern" rows="3"></textarea>
+                                <textarea class="form-control" id="chiefConcern" name="chiefConcern" rows="3" required></textarea>
                             </div>
                             <div class="mb-2">
                                 <label for="notes" class="form-label">Notes</label>
@@ -99,94 +99,54 @@
             import { PatientDB } from '../js/patientDb.js';
         
             const appointmentForm = document.getElementById("appointmentForm");
-            const physicianSelect = document.getElementById("physician");
-            const physicianContact = document.getElementById("physicianContact");
-            const scheduleDisplay = document.getElementById("scheduleDisplay");
             const appointmentModalLabel = document.getElementById("appointmentModalLabel");
             const appointmentDateInput = document.getElementById("appointmentDate");
             const appointmentTimeInput = document.getElementById("appointmentTime");
+            const patientNameInput = document.getElementById("patientName");
+            const patientContactInput = document.getElementById("patientContact");
             const chiefConcernInput = document.getElementById("chiefConcern");
             const notesInput = document.getElementById("notes");
             const deleteAppointmentButton = document.getElementById("deleteAppointmentButton");
         
+            const patientContact = patientContactInput.value.trim();
+
             const greetingElement = document.getElementById("greeting");
-            const patientId = parseInt(new URLSearchParams(window.location.search).get('patientId'));
-            const patient = PatientDB.getById(patientId);
-            if (patient) {
-                greetingElement.textContent = `Good day, ${patient.name.first} ${patient.name.last}!`;
+            const physicianId = parseInt(new URLSearchParams(window.location.search).get('physicianId'));
+            const physician = PhysicianDB.getById(physicianId);
+            if (physician) {
+                greetingElement.textContent = `Welcome, ${physician.name}!`;
             } else {
-                greetingElement.textContent = "Good day!";
+                greetingElement.textContent = "Welcome!";
             }
 
-            // Function to toggle read-only or disabled state
-            const setModalReadOnly = (isReadOnly, writableFields = []) => {
-                const allFields = [appointmentDateInput, appointmentTimeInput, physicianSelect, physicianContact,  chiefConcernInput, notesInput];
-                allFields.forEach((field) => {
-                    if (writableFields.includes(field)) {
-                        field.removeAttribute("readonly");
-                        field.removeAttribute("disabled");
-                    } else {
-                        field.setAttribute("readonly", "true");
-                        field.setAttribute("disabled", "true");
-                    }
-                });
-            };
-        
-            // Populate physician dropdown
-            physicianSelect.innerHTML = '<option selected value="">Choose...</option>';
-            PhysicianDB.getAll().forEach((phys) => {
-                const option = document.createElement('option');
-                option.value = phys.id;
-                option.textContent = phys.name;
-                physicianSelect.appendChild(option);
-            });
-        
-            // Display schedule for selected physician
-            physicianSelect.addEventListener('change', function () {
-                const selectedPhys = PhysicianDB.getById(parseInt(this.value));
-                if (!selectedPhys) {
-                    scheduleDisplay.textContent = ' ';
-                    document.getElementById("physicianContact").value = ' ';
-                    return;
-                }
-                let scheduleText = '<strong>Availability:</strong><br>';
-                Object.entries(selectedPhys.schedule).forEach(([day, details]) => {
-                    scheduleText += details.available
-                        ? `- ${day}: ${details.hours.start} - ${details.hours.end}<br>`
-                        : `- ${day}: Unavailable<br>`;
-                });
-                document.getElementById("physicianContact").value = selectedPhys ? selectedPhys.contact : "";
-                scheduleDisplay.innerHTML = scheduleText;
-            });
-        
-            // Limit dates to today and future dates
+                /*** HANDLES EVERYTHING ABOUT THE MODAL ***/
+
             const today = new Date().toISOString().split("T")[0];
             appointmentDateInput.min = today;
         
-            // Handle form submission for adding or editing
             appointmentForm.addEventListener("submit", function (event) {
                 event.preventDefault();
         
                 const appointmentId = document.getElementById("appointmentId").value;
                 const appointmentDate = appointmentDateInput.value;
                 const appointmentTime = appointmentTimeInput.value;
-                const physicianId = parseInt(physicianSelect.value);
+                const patientName = patientNameInput.value.trim();
                 const chiefConcern = chiefConcernInput.value.trim();
                 const notes = notesInput.value.trim();
         
-                if (!appointmentDate || !appointmentTime || !physicianId || !chiefConcern) {
+                if (!appointmentDate || !appointmentTime || !patientName || !chiefConcern) {
                     alert("Please fill in all required fields.");
                     return;
                 }
         
                 if (appointmentId) {
-                    // Edit existing appointment
                     const appointment = AppointmentDB.getById(parseInt(appointmentId));
                     if (appointment) {
                         const updateData = {
                             date: appointmentDate,
                             time: appointmentTime,
-                            physicianId: physicianId,
+                            patientName: patientName,
+                            patientContact: patientContact,
                             chiefConcern: chiefConcern,
                             notes: notes,
                         };
@@ -201,15 +161,20 @@
                         alert("Appointment not found.");
                     }
                 } else {
-                    // Add new appointment
                     const newAppointment = {
                         date: appointmentDate,
                         time: appointmentTime,
-                        patientId: parseInt(new URLSearchParams(window.location.search).get('patientId')),
                         physicianId: physicianId,
+                        patientId: parseInt(document.getElementById("patientId").value.trim()),
                         chiefConcern: chiefConcern,
                         notes: notes,
                     };
+
+                    if (!PatientDB.getById(newAppointment.patientId)) {
+                        alert("Missing patient information.");
+                        return;
+                    }
+
                     AppointmentDB.add(newAppointment);
                     alert("Appointment added successfully!");
                 }
@@ -219,63 +184,84 @@
                 modalInstance.hide();
             });
         
-            // Handle "Request for an Appointment" button click
-            const requestAppointmentButton = document.querySelector('[data-bs-target="#appointmentModal"]');
-            requestAppointmentButton.addEventListener("click", () => {
+                /*** HANDLES ADD NEW APPOINTMENT BUTTON ***/
+
+            const addAppointmentButton = document.querySelector('[data-bs-target="#appointmentModal"]');
+            addAppointmentButton.addEventListener("click", () => {
                 document.getElementById("appointmentId").value = "";
-                appointmentModalLabel.textContent = "Request Appointment";
+                appointmentModalLabel.textContent = "Add Appointment";
                 appointmentDateInput.value = "";
                 appointmentTimeInput.value = "";
-                physicianSelect.value = "";
-                document.getElementById("physicianContact").value = "";
+                patientNameInput.value = "";
+                patientId.value = "";
+                patientContactInput.value = "";
                 chiefConcernInput.value = "";
                 notesInput.value = "";
                 deleteAppointmentButton.style.display = "none";
+                patientId.removeAttribute("readonly");
+            });
+
+                /*** HANDLES THE USER SEARCH FOR NEW APPOINTMENTS ***/
+
+            const patientIdInput = document.getElementById("patientId");
+            patientIdInput.addEventListener("blur", function () {
+                const patientId = document.getElementById("patientId").value.trim();
+                const patient = PatientDB.getById(parseInt(patientId));
+                console.log(patientId);
                 
-                setModalReadOnly(true, [appointmentDateInput, appointmentTimeInput, physicianSelect, chiefConcernInput]);
+                if (patient) {
+                    patientNameInput.value = `${patient.name.first} ${patient.name.last}`;
+                    patientContactInput.value = patient.mobile;
+                } else {
+                    patientNameInput.value = "Cannot find patient";
+                    patientContactInput.value = "";
+                }
             });
         
-            // Load appointments into the table
+                /*** POPULATE THE TABLE WITH APPOINTMENTS ***/
             const loadAppointments = () => {
                 const tbody = document.querySelector("table.table tbody");
                 tbody.innerHTML = "";
-                const patientId = parseInt(new URLSearchParams(window.location.search).get('patientId'));
-                const appointments = AppointmentDB.getByPatientId(patientId);
+                const appointments = AppointmentDB.getByPhysicianId(physicianId);
+                console.log(appointments);
         
                 appointments.forEach((appointment) => {
-                    const physician = PhysicianDB.getById(appointment.physicianId);
+                    const patient = PatientDB.getById(appointment.patientId);
+                    const patientName = patient ? `${patient.name.first} ${patient.name.last}` : "Unknown Patient";
+                    const patientContact = patient ? patient.mobile : "Unknown Contact";
+
+
                     const row = document.createElement("tr");
                     row.innerHTML = `
                         <td>${appointment.id}</td>
                         <td>${appointment.date}</td>
                         <td>${appointment.time}</td>
-                        <td>${physician.name}</td>
-                        <td>${physician.contact}</td>
+                        <td>${patientName}</td>
+                        <td>${patientContact}</td>
                         <td>${appointment.chiefConcern}</td>
                         <td>${appointment.notes}</td>
                     `;
+
+                        /*** HANDLES EDIT EXISTING APPOINTMENTS BY CLICKING THE ROW ***/
+
                     row.classList.add("clickable-row");
                     row.addEventListener("click", () => {
                         document.getElementById("appointmentId").value = appointment.id;
                         appointmentModalLabel.textContent = `Edit Appointment ID: ${appointment.id}`;
                         appointmentDateInput.value = appointment.date;
                         appointmentTimeInput.value = appointment.time;
-                        physicianSelect.value = appointment.physicianId;
+                        patientNameInput.value = patientName;
+                        patientId.value = appointment.patientId;
+                        patientContactInput.value = patientContact;
                         chiefConcernInput.value = appointment.chiefConcern;
                         notesInput.value = appointment.notes;
-        
-                        const physician = PhysicianDB.getById(appointment.physicianId);
-                        document.getElementById("physicianContact").value = physician ? physician.contact : "N/A";
-                        scheduleDisplay.innerHTML = "";
-
-                        // Make only the "Chief Concern" field writable
-                        setModalReadOnly(true, [chiefConcernInput]);
+                        patientId.setAttribute("readonly", true);
 
                         deleteAppointmentButton.style.display = "block";
                         deleteAppointmentButton.onclick = () => {
                             const confirmDelete = confirm("Are you sure you want to delete this appointment?");
                             if (confirmDelete) {
-                                AppointmentDB.delete(appointment.id); // Assuming `AppointmentDB.delete` is a function to delete the appointment
+                                AppointmentDB.delete(appointment.id);
                                 alert("Appointment deleted successfully!");
                                 location.reload();
                             }

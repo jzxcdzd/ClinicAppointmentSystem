@@ -10,7 +10,7 @@ const initialPatientData = [
         birthdate: "2025-04-10",
         sex: "male",
         address: "de lozolle",
-        mobile: "555-1234",
+        mobile: "0967-276-7929",
         email: "sir_custodio@example.com"
     },
     {
@@ -23,7 +23,7 @@ const initialPatientData = [
         birthdate: "1990-03-25",
         sex: "male",
         address: "456 Pine Rd",
-        mobile: "555-5678",
+        mobile: "0967-276-7929",
         email: "bob@example.com"
     },
     {
@@ -36,7 +36,7 @@ const initialPatientData = [
         birthdate: "1985-07-14",
         sex: "male",
         address: "789 Maple Ave",
-        mobile: "555-9012",
+        mobile: "0967-276-7929",
         email: "charlie@example.com"
     }
 ];
