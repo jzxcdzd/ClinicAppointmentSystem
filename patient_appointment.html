@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <title>Patient Appointment</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/animate.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/index.css" />
+    <link rel="stylesheet" href="assets/css/Hero-Clean-images.css" />
+    <link rel="stylesheet" href="assets/css/Navbar-Right-Links-icons.css" />
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-md bg-body py-3">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#"
+          ><span
+            class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-hospital"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8.5 5.034v1.1l.953-.55.5.867L9 7l.953.55-.5.866-.953-.55v1.1h-1v-1.1l-.953.55-.5-.866L7 7l-.953-.55.5-.866.953.55v-1.1zM13.25 9a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zM13 11.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm.25 1.75a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zm-11-4a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 3 9.75v-.5A.25.25 0 0 0 2.75 9zm0 2a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zM2 13.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25z"
+              />
+              <path
+                d="M5 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 1 1v4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h3V3a1 1 0 0 1 1-1zm2 14h2v-3H7zm3 0h1V3H5v12h1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1zm0-14H6v1h4zm2 7v7h3V8zm-8 7V8H1v7z"
+              /></svg></span
+          ><span><strong>Aremcee Medical Center</strong></span></a
+        ><button
+          data-bs-toggle="collapse"
+          class="navbar-toggler"
+          data-bs-target="#navcol-3"
+        >
+          <span class="visually-hidden">Toggle navigation</span
+          ><span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navcol-3">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item"></li>
+            <li class="nav-item"></li>
+            <li class="nav-item"></li>
+          </ul>
+          <button
+            class="btn btn-primary"
+            data-bss-hover-animate="pulse"
+            type="button"
+            onclick="window.location.href='index.html';"
+          >
+            <strong>Back to Home</strong>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-4">
+      <h1 class="text-center mb-4" id="greeting"></h1>
+      <p class="text-center">
+        Your past and upcoming appointments will be displayed here.
+      </p>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <button
+          class="btn btn-primary"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#appointmentModal"
+        >
+          <strong>Request for an Appointment</strong>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#editPatientModal"
+        >
+          <strong> Edit My Information</strong>
+        </button>
+      </div>
+
+      <div class="table-responsive mt-4">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th class="col-date">Date</th>
+              <th class="col-time">Time</th>
+              <th class="col-physician">Physician-in-Charge</th>
+              <th class="col-contact">Contact #</th>
+              <th class="col-chief-concern">Chief Concern</th>
+              <th class="col-notes">Notes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr />
+    <div class="container mt-5">
+      <h2 class="text-center mb-4">Meet Our Physicians</h2>
+      <div class="row" id="physicianCards"></div>
+    </div>
+    <footer class="text-center py-4">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-lg-3">
+          <div class="col">
+            <p class="text-muted my-2">
+              LBYCPG3 - EQ2 | Clinic Appointment System
+            </p>
+          </div>
+          <div class="col"></div>
+          <div class="col">
+            <p class="text-muted my-2">Santiago, Macariola, Algarra</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <div
+      class="modal fade"
+      role="dialog"
+      tabindex="-1"
+      id="appointmentModal"
+      aria-labelledby="appointmentModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="appointmentModalLabel">
+              Request Appointment
+            </h5>
+            <button
+              class="btn-close"
+              aria-label="Close"
+              data-bs-dismiss="modal"
+              type="button"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="appointmentForm">
+              <input type="hidden" id="appointmentId" name="appointmentId" />
+              <div class="mb-2">
+                <label class="form-label" for="physician"
+                  >Physician-in-charge</label
+                ><select
+                  class="form-select form-select"
+                  id="physician"
+                  name="physician"
+                >
+                  <option value="" selected="">Choose...</option>
+                  <option value="1">Dr. Algarra</option>
+                  <option value="2">Dr. Macariola</option>
+                  <option value="3">Dr. Santiago</option>
+                </select>
+                <div class="mt-2" id="scheduleDisplay"></div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="physicianContact"
+                  >Physician Contact #</label
+                ><input
+                  class="form-control form-control"
+                  type="text"
+                  id="physicianContact"
+                  name="physicianContact"
+                />
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label" for="appointmentDate">Date</label
+                  ><input
+                    class="form-control form-control"
+                    id="appointmentDate"
+                    name="appointmentDate"
+                    type="date"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="appointmentTime">Time</label>
+                  <select
+                    class="form-select"
+                    id="appointmentTime"
+                    name="appointmentTime"
+                  >
+                    <option value="" selected>Choose...</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="chiefConcern"
+                  >Chief Concern</label
+                ><textarea
+                  class="form-control form-control"
+                  id="chiefConcern"
+                  name="chiefConcern"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="notes">Notes</label
+                ><textarea
+                  class="form-control form-control"
+                  id="notes"
+                  name="notes"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">
+                  Save Appointment</button
+                ><button
+                  class="btn btn-danger"
+                  id="deleteAppointmentButton"
+                  style="display: none"
+                  type="button"
+                >
+                  Delete Appointment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for editing patient information -->
+    <div
+      class="modal fade"
+      id="editPatientModal"
+      tabindex="-1"
+      aria-labelledby="editPatientModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editPatientModalLabel">
+              Edit Personal Information
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="patientInfoForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="firstName" class="form-label">First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstName"
+                    name="firstName"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="lastName" class="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastName"
+                    name="lastName"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="middleName" class="form-label">Middle Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="middleName"
+                  name="middleName"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="birthdate" class="form-label">Birthdate</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="birthdate"
+                  name="birthdate"
+                  readonly
+                />
+                <small class="form-text text-muted"
+                  >Birth date cannot be changed for record consistency.</small
+                >
+              </div>
+              <div class="mb-3">
+                <label for="sex" class="form-label">Sex</label>
+                <select class="form-select" id="sex" name="sex" required>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <textarea
+                  class="form-control"
+                  id="address"
+                  name="address"
+                  rows="2"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="mobile" class="form-label">Mobile Number</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="mobile"
+                  name="mobile"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+      import { PhysicianDB } from "./assets/js/physicianDb.js";
+      import { AppointmentDB } from "./assets/js/appointmentsDb.js";
+      import { PatientDB } from "./assets/js/patientDb.js";
+
+      const appointmentForm = document.getElementById("appointmentForm");
+      const physicianSelect = document.getElementById("physician");
+      const physicianContact = document.getElementById("physicianContact");
+      const scheduleDisplay = document.getElementById("scheduleDisplay");
+      const appointmentModalLabel = document.getElementById(
+        "appointmentModalLabel"
+      );
+      const appointmentDateInput = document.getElementById("appointmentDate");
+      const appointmentTimeInput = document.getElementById("appointmentTime");
+      const chiefConcernInput = document.getElementById("chiefConcern");
+      const notesInput = document.getElementById("notes");
+      const deleteAppointmentButton = document.getElementById(
+        "deleteAppointmentButton"
+      );
+
+      /*** SIMPLE GREETING TO DISPLAY CURRENT USER ***/
+
+      const greetingElement = document.getElementById("greeting");
+      const patientId = parseInt(
+        new URLSearchParams(window.location.search).get("patientId")
+      );
+      const patient = PatientDB.getById(patientId);
+      if (patient) {
+        greetingElement.textContent = `Good day, ${patient.name.first} ${patient.name.last}!`;
+      } else {
+        greetingElement.textContent = "Good day!";
+      }
+
+      /*** HANDLES PHYSICIAN CARDS ***/
+
+      const physicianCardsContainer = document.getElementById("physicianCards");
+      const physicians = PhysicianDB.getAll();
+      physicians.forEach((physician) => {
+        console.log(physician.image); // Debugging: Check the image path
+        const card = document.createElement("div");
+        card.className = "col-md-4 mb-3";
+        card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            ${
+                              physician.image
+                                ? `<img src="assets/img/${physician.image}" alt="${physician.name}" class="img-fluid mb-3" style="width: 100%; height: auto;">`
+                                : `<div class="image-placeholder mb-3" style="width: 100%; height: 400px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: #aaa;">Image Placeholder</span>
+                                    </div>`
+                            }
+                            <h5 class="card-title">${physician.name}</h5>
+                            <p class="card-text"><strong>Specialty:</strong> ${
+                              physician.specialty
+                            }</p>
+                            <p class="card-text"><strong>Contact:</strong> ${
+                              physician.contact
+                            }</p>
+                            <p class="card-text"><strong>Bio:</strong> ${
+                              physician.bio
+                            }</p>
+                        </div>
+                    </div>
+                `;
+        physicianCardsContainer.appendChild(card);
+      });
+
+      /*** HANDLES MODAL FORMATTING ***/
+
+      const setModalReadOnly = (isReadOnly, writableFields = []) => {
+        const allFields = [
+          appointmentDateInput,
+          appointmentTimeInput,
+          physicianSelect,
+          physicianContact,
+          chiefConcernInput,
+          notesInput,
+        ];
+        allFields.forEach((field) => {
+          if (writableFields.includes(field)) {
+            field.removeAttribute("readonly");
+            field.removeAttribute("disabled");
+          } else {
+            field.setAttribute("readonly", "true");
+            field.setAttribute("disabled", "true");
+          }
+        });
+      };
+
+      physicianSelect.innerHTML =
+        '<option selected value="">Choose...</option>';
+      PhysicianDB.getAll().forEach((phys) => {
+        const option = document.createElement("option");
+        option.value = phys.id;
+        option.textContent = phys.name;
+        physicianSelect.appendChild(option);
+      });
+
+      physicianSelect.addEventListener("change", function () {
+        const selectedPhys = PhysicianDB.getById(parseInt(this.value));
+        const appointmentDate = appointmentDateInput.value;
+
+        if (!selectedPhys) {
+          scheduleDisplay.textContent = " ";
+          document.getElementById("physicianContact").value = " ";
+          appointmentTimeInput.innerHTML =
+            '<option value="" selected>Choose...</option>';
+          return;
+        }
+
+        if (selectedPhys) {
+          updateAvailableDates(selectedPhys);
+
+          if (appointmentDate) {
+            generateAvailableTimeSlots(selectedPhys, appointmentDate);
+          }
+        }
+
+        // Display the physician's schedule
+        let scheduleText = "<strong>Availability:</strong><br>";
+        Object.entries(selectedPhys.schedule).forEach(([day, details]) => {
+          scheduleText += details.available
+            ? `- ${day}: ${details.hours.start} - ${details.hours.end}<br>`
+            : `- ${day}: Unavailable<br>`;
+        });
+        document.getElementById("physicianContact").value =
+          selectedPhys.contact;
+        scheduleDisplay.innerHTML = scheduleText;
+
+        // Generate available time slots if a date is selected
+        if (appointmentDate) {
+          generateAvailableTimeSlots(selectedPhys, appointmentDate);
+        }
+      });
+
+      appointmentDateInput.addEventListener("change", function () {
+        const selectedPhys = PhysicianDB.getById(
+          parseInt(physicianSelect.value)
+        );
+        const appointmentDate = this.value;
+
+        if (selectedPhys && appointmentDate) {
+          generateAvailableTimeSlots(selectedPhys, appointmentDate);
+        }
+      });
+
+      function generateAvailableTimeSlots(physician, date) {
+        const timeInput = appointmentTimeInput;
+        timeInput.innerHTML = '<option value="" selected>Choose...</option>';
+
+        // Get the physician's schedule for the selected day
+        const dayOfWeek = new Date(date).toLocaleString("en-US", {
+          weekday: "long",
+        });
+        const schedule = physician.schedule[dayOfWeek];
+
+        if (!schedule || !schedule.available) {
+          timeInput.innerHTML =
+            '<option value="" selected>No available times</option>';
+          return;
+        }
+
+        // Generate 30-minute time slots
+        const startTime = schedule.hours.start;
+        const endTime = schedule.hours.end;
+        const bookedAppointments = AppointmentDB.getByPhysicianId(
+          physician.id
+        ).filter((appointment) => appointment.date === date);
+
+        const availableSlots = [];
+        let currentTime = new Date(`1970-01-01T${startTime}:00`);
+        const endTimeDate = new Date(`1970-01-01T${endTime}:00`);
+
+        while (currentTime < endTimeDate) {
+          const timeString = currentTime.toTimeString().slice(0, 5); // Format as HH:mm
+
+          // Check if the time slot ends in :00 or :30
+          const minutes = currentTime.getMinutes();
+          if (minutes === 0 || minutes === 30) {
+            // Check if the time slot is already booked
+            const isBooked = bookedAppointments.some(
+              (appointment) => appointment.time === timeString
+            );
+
+            if (!isBooked) {
+              availableSlots.push(timeString);
+            }
+          }
+
+          // Increment by 30 minutes
+          currentTime.setMinutes(currentTime.getMinutes() + 30);
+        }
+
+        // Populate the dropdown with available slots
+        availableSlots.forEach((slot) => {
+          const option = document.createElement("option");
+          option.value = slot;
+          option.textContent = slot;
+          timeInput.appendChild(option);
+        });
+
+        if (availableSlots.length === 0) {
+          timeInput.innerHTML =
+            '<option value="" selected>No available times</option>';
+        }
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      appointmentDateInput.min = today;
+
+      // HANDLER FOR UPDATING AVAILABLE DATES
+      function updateAvailableDates(physician) {
+        const appointmentDateInput = document.getElementById("appointmentDate");
+
+        // Clear any previously set attributes
+        appointmentDateInput.value = "";
+        appointmentDateInput.removeAttribute("min");
+        appointmentDateInput.removeAttribute("max");
+
+        // Get the physician's schedule
+        const schedule = physician.schedule;
+
+        // Find the earliest and latest available dates
+        const today = new Date();
+        const availableDays = Object.keys(schedule).filter(
+          (day) => schedule[day].available
+        );
+
+        if (availableDays.length === 0) {
+          appointmentDateInput.disabled = true;
+          alert("This physician has no available dates.");
+          return;
+        }
+
+        appointmentDateInput.disabled = false;
+
+        // Set the min and max dates based on availability
+        const minDate = new Date(today);
+        const maxDate = new Date(today);
+        maxDate.setDate(today.getDate() + 30); // Assume a 30-day range for simplicity
+
+        // Disable unavailable dates
+        appointmentDateInput.addEventListener("input", function () {
+          const selectedDate = new Date(this.value);
+          const dayOfWeek = selectedDate.toLocaleString("en-US", {
+            weekday: "long",
+          });
+
+          if (!schedule[dayOfWeek] || !schedule[dayOfWeek].available) {
+            alert(
+              "The selected date is unavailable for this physician. Please select another date."
+            );
+            this.value = ""; // Clear the invalid date
+          }
+        });
+      }
+
+      /*** HANDLES MODAL SUBMIT BUTTON ***/
+
+      appointmentForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const appointmentId = document.getElementById("appointmentId").value;
+        const appointmentDate = appointmentDateInput.value;
+        const appointmentTime = appointmentTimeInput.value;
+        const physicianId = parseInt(physicianSelect.value);
+        const chiefConcern = chiefConcernInput.value.trim();
+        const notes = notesInput.value.trim();
+
+        if (
+          !appointmentDate ||
+          !appointmentTime ||
+          !physicianId ||
+          !chiefConcern
+        ) {
+          alert("Please fill in all required fields.");
+          return;
+        }
+
+        if (appointmentId) {
+          // Edit existing appointment
+          const appointment = AppointmentDB.getById(parseInt(appointmentId));
+          if (appointment) {
+            const updateData = {
+              date: appointmentDate,
+              time: appointmentTime,
+              physicianId: physicianId,
+              chiefConcern: chiefConcern,
+              notes: notes,
+            };
+            const updated = AppointmentDB.update(appointment.id, updateData);
+            if (updated) {
+              alert("Appointment updated successfully!");
+              location.reload();
+            } else {
+              alert("Failed to update appointment.");
+            }
+          } else {
+            alert("Appointment not found.");
+          }
+        } else {
+          // Add new appointment
+          const newAppointment = {
+            date: appointmentDate,
+            time: appointmentTime,
+            patientId: parseInt(
+              new URLSearchParams(window.location.search).get("patientId")
+            ),
+            physicianId: physicianId,
+            chiefConcern: chiefConcern,
+            notes: notes,
+          };
+          AppointmentDB.add(newAppointment);
+          alert("Appointment added successfully!");
+        }
+
+        // Reload appointments and close the modal
+        loadAppointments();
+
+        // Properly hide the modal and remove the backdrop
+        const modalElement = document.getElementById("appointmentModal");
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+
+        // Ensure the backdrop is removed
+        document
+          .querySelectorAll(".modal-backdrop")
+          .forEach((backdrop) => backdrop.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style = ""; // Reset body styles
+      });
+
+      /*** HANDLES NEW APPOINTMENT BUTTON CLICK ***/
+
+      const requestAppointmentButton = document.querySelector(
+        '[data-bs-target="#appointmentModal"]'
+      );
+      requestAppointmentButton.addEventListener("click", () => {
+        document.getElementById("appointmentId").value = "";
+        appointmentModalLabel.textContent = "Request Appointment";
+        appointmentDateInput.value = "";
+        appointmentTimeInput.value = "";
+        physicianSelect.value = "";
+        document.getElementById("physicianContact").value = "";
+        chiefConcernInput.value = "";
+        notesInput.value = "";
+        deleteAppointmentButton.style.display = "none";
+
+        setModalReadOnly(true, [
+          appointmentDateInput,
+          appointmentTimeInput,
+          physicianSelect,
+          chiefConcernInput,
+        ]);
+      });
+
+      /*** HANDLES APPOINTMENT TABLE ***/
+
+      const loadAppointments = () => {
+        const tbody = document.querySelector("table.table tbody");
+        tbody.innerHTML = "";
+        const patientId = parseInt(
+          new URLSearchParams(window.location.search).get("patientId")
+        );
+        const appointments = AppointmentDB.getByPatientId(patientId);
+
+        appointments.forEach((appointment) => {
+          const physician = PhysicianDB.getById(appointment.physicianId);
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                        <td>${appointment.id}</td>
+                        <td>${appointment.date}</td>
+                        <td>${appointment.time}</td>
+                        <td>${physician.name}</td>
+                        <td>${physician.contact}</td>
+                        <td>${appointment.chiefConcern}</td>
+                        <td>${appointment.notes}</td>
+                    `;
+          row.classList.add("clickable-row");
+          row.addEventListener("click", () => {
+            document.getElementById("appointmentId").value = appointment.id;
+            appointmentModalLabel.textContent = `Edit Appointment ID: ${appointment.id}`;
+            appointmentDateInput.value = appointment.date;
+            appointmentTimeInput.value = appointment.time;
+            physicianSelect.value = appointment.physicianId;
+            chiefConcernInput.value = appointment.chiefConcern;
+            notesInput.value = appointment.notes;
+
+            const physician = PhysicianDB.getById(appointment.physicianId);
+            document.getElementById("physicianContact").value = physician
+              ? physician.contact
+              : "N/A";
+            scheduleDisplay.innerHTML = "";
+
+            // Make only the "Chief Concern" field writable
+            setModalReadOnly(true, [chiefConcernInput]);
+
+            deleteAppointmentButton.style.display = "block";
+            deleteAppointmentButton.onclick = () => {
+              const confirmDelete = confirm(
+                "Are you sure you want to delete this appointment?"
+              );
+              if (confirmDelete) {
+                AppointmentDB.delete(appointment.id); // Assuming `AppointmentDB.delete` is a function to delete the appointment
+                alert("Appointment deleted successfully!");
+                location.reload();
+              }
+            };
+
+            const modalInstance = new bootstrap.Modal(
+              document.getElementById("appointmentModal")
+            );
+            modalInstance.show();
+          });
+          tbody.appendChild(row);
+        });
+      };
+
+      // Add this code after loading appointments
+      // Handle the patient info edit modal
+      const patientInfoForm = document.getElementById("patientInfoForm");
+
+      // Function to load patient info into the form
+      function loadPatientInfo() {
+        const patient = PatientDB.getById(patientId);
+        if (!patient) return;
+
+        // Populate form fields with patient data
+        document.getElementById("firstName").value = patient.name.first;
+        document.getElementById("middleName").value = patient.name.middle || "";
+        document.getElementById("lastName").value = patient.name.last;
+        document.getElementById("birthdate").value = patient.birthdate;
+        document.getElementById("sex").value = patient.sex.toLowerCase();
+        document.getElementById("address").value = patient.address;
+        document.getElementById("mobile").value = patient.mobile;
+        document.getElementById("email").value = patient.email;
+      }
+
+      // Handle form submission for updating patient info
+      patientInfoForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const firstName = document.getElementById("firstName").value.trim();
+        const middleName = document.getElementById("middleName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const sex = document.getElementById("sex").value;
+        const address = document.getElementById("address").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const email = document.getElementById("email").value.trim();
+
+        // Validate required fields
+        if (!firstName || !lastName || !sex || !address || !mobile || !email) {
+          alert("Please fill in all required fields.");
+          return;
+        }
+
+        // Build the updated patient object
+        const updatedPatient = {
+          name: {
+            first: firstName,
+            middle: middleName,
+            last: lastName,
+          },
+          sex: sex,
+          address: address,
+          mobile: mobile,
+          email: email,
+        };
+
+        // Update the patient in the database
+        const updated = PatientDB.update(patientId, updatedPatient);
+
+        if (updated) {
+          alert("Your information has been updated successfully!");
+          // Update greeting with new name
+          greetingElement.textContent = `Good day, ${firstName} ${lastName}!`;
+
+          // Close the modal
+          const modalElement = document.getElementById("editPatientModal");
+          const modalInstance = bootstrap.Modal.getInstance(modalElement);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+
+          // Ensure the backdrop is removed
+          document
+            .querySelectorAll(".modal-backdrop")
+            .forEach((backdrop) => backdrop.remove());
+          document.body.classList.remove("modal-open");
+          document.body.style = ""; // Reset body styles
+        } else {
+          alert("Failed to update your information.");
+        }
+      });
+
+      // Add event listener for when the edit modal is shown
+      document
+        .getElementById("editPatientModal")
+        .addEventListener("show.bs.modal", function () {
+          loadPatientInfo();
+        });
+
+      loadAppointments();
+    </script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
