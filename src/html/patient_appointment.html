@@ -9,15 +9,20 @@
     <body>
         <!-- Table for appointments -->
         <div class="container mt-4">
-            <h1 id="greeting" class="text-center mb-4"></h1>
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <h1 id="greeting" class="mb-0"></h1>
+            </div>
             <p class="text-center">Your past and upcoming appointments will be displayed here.</p>
-            <div class="d-flex justify-content-center mt-3">
+            <div class="d-flex justify-content-center gap-3 mt-3">
                 <!-- Button triggers the modal -->
                 <button type="button"
                         class="btn btn-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#appointmentModal">
                     Request for an Appointment
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPatientModal">
+                    <i class="bi bi-pencil-square"></i> Edit My Information
                 </button>
             </div>
             <div class="table-responsive mt-4">
@@ -94,6 +99,63 @@
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Save Appointment</button>                            
                                 <button type="button" class="btn btn-danger" id="deleteAppointmentButton" style="display: none;">Delete Appointment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for editing patient information -->
+        <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPatientModalLabel">Edit Personal Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="patientInfoForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middleName" name="middleName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="birthdate" class="form-label">Birthdate</label>
+                                <input type="date" class="form-control" id="birthdate" name="birthdate" readonly>
+                                <small class="form-text text-muted">Birth date cannot be changed for record consistency.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sex" class="form-label">Sex</label>
+                                <select class="form-select" id="sex" name="sex" required>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Mobile Number</label>
+                                <input type="tel" class="form-control" id="mobile" name="mobile" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
                         </form>
                     </div>
@@ -329,6 +391,77 @@
             };
         
             loadAppointments();
+
+            // Add this code after loading appointments
+            // Handle the patient info edit modal
+            const patientInfoForm = document.getElementById("patientInfoForm");
+
+            // Function to load patient info into the form
+            function loadPatientInfo() {
+                const patient = PatientDB.getById(patientId);
+                if (!patient) return;
+                
+                // Populate form fields with patient data
+                document.getElementById("firstName").value = patient.name.first;
+                document.getElementById("middleName").value = patient.name.middle || '';
+                document.getElementById("lastName").value = patient.name.last;
+                document.getElementById("birthdate").value = patient.birthdate;
+                document.getElementById("sex").value = patient.sex.toLowerCase();
+                document.getElementById("address").value = patient.address;
+                document.getElementById("mobile").value = patient.mobile;
+                document.getElementById("email").value = patient.email;
+            }
+
+            // Handle form submission for updating patient info
+            patientInfoForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                
+                const firstName = document.getElementById("firstName").value.trim();
+                const middleName = document.getElementById("middleName").value.trim();
+                const lastName = document.getElementById("lastName").value.trim();
+                const sex = document.getElementById("sex").value;
+                const address = document.getElementById("address").value.trim();
+                const mobile = document.getElementById("mobile").value.trim();
+                const email = document.getElementById("email").value.trim();
+                
+                // Validate required fields
+                if (!firstName || !lastName || !sex || !address || !mobile || !email) {
+                    alert("Please fill in all required fields.");
+                    return;
+                }
+                
+                // Build the updated patient object
+                const updatedPatient = {
+                    name: {
+                        first: firstName,
+                        middle: middleName,
+                        last: lastName
+                    },
+                    sex: sex,
+                    address: address,
+                    mobile: mobile,
+                    email: email
+                };
+                
+                // Update the patient in the database
+                const updated = PatientDB.update(patientId, updatedPatient);
+                
+                if (updated) {
+                    alert("Your information has been updated successfully!");
+                    // Update greeting with new name
+                    greetingElement.textContent = `Good day, ${firstName} ${lastName}!`;
+                    // Close the modal
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById("editPatientModal"));
+                    modalInstance.hide();
+                } else {
+                    alert("Failed to update your information.");
+                }
+            });
+
+            // Add event listener for when the edit modal is shown
+            document.getElementById('editPatientModal').addEventListener('show.bs.modal', function() {
+                loadPatientInfo();
+            });
         </script>
     </body>
 </html>
