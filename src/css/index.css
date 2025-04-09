@@ -9,6 +9,16 @@
     height: 50px;
 }
 
+.editable-field {
+    background-color: #fff8e1;
+}
+.clickable-row {
+    cursor: pointer;
+}
+.clickable-row:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
 /* table styles */
 .clickable-row {
     cursor: pointer;

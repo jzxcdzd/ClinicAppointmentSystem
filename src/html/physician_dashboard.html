@@ -5,6 +5,8 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Link to external CSS -->
         <link rel="stylesheet" href="../css/index.css">
+        <style>
+        </style>
     </head>
     <body>
         <div class="container mt-4">
@@ -131,6 +133,7 @@
                 const appointmentDate = appointmentDateInput.value;
                 const appointmentTime = appointmentTimeInput.value;
                 const patientName = patientNameInput.value.trim();
+                const patientContactValue = patientContactInput.value.trim();
                 const chiefConcern = chiefConcernInput.value.trim();
                 const notes = notesInput.value.trim();
         
@@ -142,18 +145,52 @@
                 if (appointmentId) {
                     const appointment = AppointmentDB.getById(parseInt(appointmentId));
                     if (appointment) {
+                        // Get the patient ID from the appointment
+                        const patientId = appointment.patientId;
+                        // First update the patient information if it's changed
+                        const patient = PatientDB.getById(patientId);
+                        
+                        if (patient) {
+                            // Check if name has been edited
+                            const nameParts = patientName.split(' ');
+                            if (nameParts.length >= 2) {
+                                // Simple name split - assumes first name and last name format
+                                const firstName = nameParts[0];
+                                const lastName = nameParts[nameParts.length - 1];
+                                
+                                if (firstName !== patient.name.first || lastName !== patient.name.last) {
+                                    // Update the patient record
+                                    PatientDB.update(patientId, {
+                                        name: {
+                                            ...patient.name,
+                                            first: firstName,
+                                            last: lastName
+                                        }
+                                    });
+                                }
+                            }
+                            
+                            // Check if contact has been edited
+                            if (patientContactValue !== patient.mobile) {
+                                PatientDB.update(patientId, {
+                                    mobile: patientContactValue
+                                });
+                            }
+                        }
+                        
+                        // Now update the appointment
                         const updateData = {
                             date: appointmentDate,
                             time: appointmentTime,
-                            patientName: patientName,
-                            patientContact: patientContact,
                             chiefConcern: chiefConcern,
                             notes: notes,
                         };
                         const updated = AppointmentDB.update(appointment.id, updateData);
                         if (updated) {
-                            alert("Appointment updated successfully!");
-                            location.reload();
+                            alert("Appointment and patient details updated successfully!");
+                            loadAppointments();
+                            const modalInstance = bootstrap.Modal.getInstance(document.getElementById("appointmentModal"));
+                            modalInstance.hide();
                         } else {
                             alert("Failed to update appointment.");
                         }
@@ -161,6 +198,7 @@
                         alert("Appointment not found.");
                     }
                 } else {
+                    // Add new appointment (unchanged code)
                     const newAppointment = {
                         date: appointmentDate,
                         time: appointmentTime,
@@ -169,19 +207,18 @@
                         chiefConcern: chiefConcern,
                         notes: notes,
                     };
-
+        
                     if (!PatientDB.getById(newAppointment.patientId)) {
                         alert("Missing patient information.");
                         return;
                     }
-
+        
                     AppointmentDB.add(newAppointment);
                     alert("Appointment added successfully!");
+                    loadAppointments();
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById("appointmentModal"));
+                    modalInstance.hide();
                 }
-        
-                loadAppointments();
-                const modalInstance = bootstrap.Modal.getInstance(document.getElementById("appointmentModal"));
-                modalInstance.hide();
             });
         
                 /*** HANDLES ADD NEW APPOINTMENT BUTTON ***/
@@ -199,6 +236,7 @@
                 notesInput.value = "";
                 deleteAppointmentButton.style.display = "none";
                 patientId.removeAttribute("readonly");
+                setupEditMode(false);
             });
 
                 /*** HANDLES THE USER SEARCH FOR NEW APPOINTMENTS ***/
@@ -254,16 +292,19 @@
                         patientId.value = appointment.patientId;
                         patientContactInput.value = patientContact;
                         chiefConcernInput.value = appointment.chiefConcern;
-                        notesInput.value = appointment.notes;
+                        notesInput.value = appointment.notes || '';
                         patientId.setAttribute("readonly", true);
 
                         deleteAppointmentButton.style.display = "block";
+                        setupEditMode(true);
                         deleteAppointmentButton.onclick = () => {
                             const confirmDelete = confirm("Are you sure you want to delete this appointment?");
                             if (confirmDelete) {
                                 AppointmentDB.delete(appointment.id);
                                 alert("Appointment deleted successfully!");
-                                location.reload();
+                                loadAppointments();
+                                const modalInstance = bootstrap.Modal.getInstance(document.getElementById("appointmentModal"));
+                                modalInstance.hide();
                             }
                         };
         
@@ -273,6 +314,42 @@
                     tbody.appendChild(row);
                 });
             };
+
+            function setupEditMode(isEditMode) {
+                // Clear any previous highlighting
+                appointmentDateInput.classList.remove('editable-field');
+                appointmentTimeInput.classList.remove('editable-field');
+                chiefConcernInput.classList.remove('editable-field');
+                notesInput.classList.remove('editable-field');
+                patientNameInput.classList.remove('editable-field');
+                patientContactInput.classList.remove('editable-field');
+                
+                if (isEditMode) {
+                    // Highlight fields that can be edited
+                    appointmentDateInput.classList.add('editable-field');
+                    appointmentTimeInput.classList.add('editable-field');
+                    chiefConcernInput.classList.add('editable-field');
+                    notesInput.classList.add('editable-field');
+                    patientNameInput.classList.add('editable-field');
+                    patientContactInput.classList.add('editable-field');
+                    
+                    // Make name and contact editable
+                    patientNameInput.removeAttribute('readonly');
+                    patientContactInput.removeAttribute('readonly');
+                    
+                    // Focus on notes as that's typically what physicians update
+                    notesInput.focus();
+                    
+                    // Change button text to indicate editing
+                    document.querySelector('#appointmentForm button[type="submit"]').textContent = "Update Appointment";
+                } else {
+                    // For adding new appointments
+                    patientNameInput.setAttribute('readonly', true);
+                    patientContactInput.setAttribute('readonly', true);
+                    
+                    document.querySelector('#appointmentForm button[type="submit"]').textContent = "Save Appointment";
+                }
+            }
         
             loadAppointments();
         </script>
