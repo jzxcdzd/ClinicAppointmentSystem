@@ -1,5 +1,5 @@
 // Mock database of appointments
-export const appointmentData = [
+const initialAppointmentData = [
     {
         id: 1, // Appointment ID
         date: "2025-04-10",
@@ -13,7 +13,7 @@ export const appointmentData = [
         id: 2,
         date: "2025-04-11",
         time: "14:00",
-        patientId: 2, // Reference to patientData (Bob)
+        patientId: 1, // Reference to patientData (Bob)
         physicianId: 1, // Reference to physicianData (Dr. Joshua Algarra)
         chiefConcern: "Chest pain",
         notes: "Scheduled for ECG and blood tests."
@@ -22,37 +22,54 @@ export const appointmentData = [
         id: 3,
         date: "2025-04-12",
         time: "09:00",
-        patientId: 3, // Reference to patientData (Charlie)
+        patientId: 1, // Reference to patientData (Charlie)
         physicianId: 1, // Reference to physicianData (Dr. Ezekiel Santiago)
         chiefConcern: "Migraine",
         notes: "Recommended MRI and follow-up in 2 weeks."
     }
 ];
 
+// Initialize localStorage with initial data if not already set
+export const initializeAppointmentsDb = () => {
+    if (!localStorage.getItem('appointmentData')) {
+        localStorage.setItem('appointmentData', JSON.stringify(initialAppointmentData));
+    }
+};
+
+// Helper functions to interact with localStorage
+const getAppointmentData = () => JSON.parse(localStorage.getItem('appointmentData'));
+const saveAppointmentData = (data) => localStorage.setItem('appointmentData', JSON.stringify(data));
+
 // Functions to simulate DB queries
 export const AppointmentDB = {
-    getAll: () => appointmentData,
-    getById: (id) => appointmentData.find(a => a.id === id),
-    getByPatientId: (patientId) => appointmentData.filter(a => a.patientId === patientId),
-    getByPhysicianId: (physicianId) => appointmentData.filter(a => a.physicianId === physicianId),
+    getAll: () => getAppointmentData(),
+    getById: (id) => getAppointmentData().find(a => a.id === id),
+    getByPatientId: (patientId) => getAppointmentData().filter(a => a.patientId === patientId),
+    getByPhysicianId: (physicianId) => getAppointmentData().filter(a => a.physicianId === physicianId),
     add: (newAppointment) => {
-        const newId = appointmentData.length > 0 ? appointmentData[appointmentData.length - 1].id + 1 : 1;
+        const data = getAppointmentData();
+        const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1;
         const appointment = { id: newId, ...newAppointment };
-        appointmentData.push(appointment);
+        data.push(appointment);
+        saveAppointmentData(data);
         return appointment;
     },
     update: (id, newData) => {
-        const index = appointmentData.findIndex(a => a.id === id);
+        const data = getAppointmentData();
+        const index = data.findIndex(a => a.id === id);
         if (index !== -1) {
-            appointmentData[index] = { ...appointmentData[index], ...newData };
+            data[index] = { ...data[index], ...newData };
+            saveAppointmentData(data);
             return true;
         }
         return false;
     },
     delete: (id) => {
-        const index = appointmentData.findIndex(a => a.id === id);
+        const data = getAppointmentData();
+        const index = data.findIndex(a => a.id === id);
         if (index !== -1) {
-            appointmentData.splice(index, 1);
+            data.splice(index, 1);
+            saveAppointmentData(data);
             return true;
         }
         return false;

@@ -1,17 +1,17 @@
 // Mock database of patients
-export const patientData = [
+const initialPatientData = [
     {
         id: 1,
         name: {
-            first: "Alice",
-            middle: "Q",
-            last: "Smith"
+            first: "Jose Miguel",
+            middle: "F",
+            last: "Custodio"
         },
         birthdate: "1998-10-12",
-        sex: "female",
-        address: "123 Oak St",
+        sex: "male",
+        address: "de lozolle",
         mobile: "555-1234",
-        email: "alice@example.com"
+        email: "sir_custodio@example.com"
     },
     {
         id: 2,
@@ -41,28 +41,45 @@ export const patientData = [
     }
 ];
 
+// init with pre-made data
+export const initializePatientsDb = () => {
+    if (!localStorage.getItem('patientData')) {
+        localStorage.setItem('patientData', JSON.stringify(initialPatientData));
+    }
+};
+
+// get and set functions
+const getPatientData = () => JSON.parse(localStorage.getItem('patientData'));
+const savePatientData = (data) => localStorage.setItem('patientData', JSON.stringify(data));
+
 // Functions to simulate DB queries
 export const PatientDB = {
-    getAll: () => patientData,
-    getById: (id) => patientData.find(p => p.id === id),
+    getAll: () => getPatientData(),
+    getById: (id) => getPatientData().find(p => p.id === id),
     update: (id, newData) => {
-        const index = patientData.findIndex(p => p.id === id);
+        const data = getPatientData();
+        const index = data.findIndex(p => p.id === id);
         if (index !== -1) {
-            patientData[index] = { ...patientData[index], ...newData };
+            data[index] = { ...data[index], ...newData };
+            savePatientData(data);
             return true;
         }
         return false;
     },
     add: (newPatient) => {
-        const newId = patientData.length > 0 ? patientData[patientData.length - 1].id + 1 : 1;
+        const data = getPatientData();
+        const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1;
         const patient = { id: newId, ...newPatient };
-        patientData.push(patient);
+        data.push(patient);
+        savePatientData(data);
         return patient;
     },
     delete: (id) => {
-        const index = patientData.findIndex(p => p.id === id);
+        const data = getPatientData();
+        const index = data.findIndex(p => p.id === id);
         if (index !== -1) {
-            patientData.splice(index, 1);
+            data.splice(index, 1);
+            savePatientData(data);
             return true;
         }
         return false;

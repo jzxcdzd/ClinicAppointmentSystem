@@ -7,9 +7,13 @@ info will be cross-checked with the database
 if certain info matches (non-case sensitive):
 first name && last name && birthdate
 this means patient is already registered
+so proceed to patient_appointment.html and use data from matched patient
+should proceed even when other info is not filled out
 
-if not then patient is new
-will auto register
+if the 3 info does not match then patient is new
+will auto register & create entry in patientDb
+and then proceed to patient_appointment.html
+as long as all info are filled out else, "error: please fill out all fields"
 
 clicking submit will take you to patient_appointment.html
 
@@ -37,10 +41,10 @@ clicking submit will take you to patient_appointment.html
                 upang matiyak na ang iyong impormasyon ay nakuha nang tama.
                 </i>
             </p>
-            <form action="patient_appointment.html" method="GET">
+            <form id="patientLoginForm">
                 <div class="mb-3">
                     <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="firstName" name="firstName">
+                    <input type="text" class="form-control" id="firstName" name="firstName" required>
                 </div>
                 <div class="mb-3">
                     <label for="middleName" class="form-label">Middle Name</label>
@@ -48,15 +52,15 @@ clicking submit will take you to patient_appointment.html
                 </div>
                 <div class="mb-3">
                     <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lastName" name="lastName">
+                    <input type="text" class="form-control" id="lastName" name="lastName" required>
                 </div>
                 <div class="mb-3">
                     <label for="birthdate" class="form-label">Birthdate</label>
-                    <input type="date" class="form-control" id="birthdate">
+                    <input type="date" class="form-control" id="birthdate" name="birthdate" required>
                 </div>
                 <div class="mb-3">
                     <label for="sex" class="form-label">Sex</label>
-                    <select class="form-select" id="sex">
+                    <select class="form-select" id="sex" name="sex">
                         <option selected>Choose...</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -64,15 +68,15 @@ clicking submit will take you to patient_appointment.html
                 </div>
                 <div class="mb-3">
                     <label for="address" class="form-label">Address</label>
-                    <textarea class="form-control" id="address" rows="2" ></textarea>
+                    <textarea class="form-control" id="address" name="address" rows="2"></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="mobileNumber" class="form-label">Mobile Number</label>
-                    <input type="tel" class="form-control" id="mobileNumber">
+                    <input type="tel" class="form-control" id="mobileNumber" name="mobileNumber">
                 </div>
                 <div class="mb-3">
                     <label for="emailAddress" class="form-label">E-mail</label>
-                    <input type="email" class="form-control" id="emailAddress" >
+                    <input type="email" class="form-control" id="emailAddress" name="emailAddress">
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg">Submit</button>
@@ -82,5 +86,74 @@ clicking submit will take you to patient_appointment.html
 
         <!-- Bootstrap JS (optional) & dependencies -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module">
+            import { PatientDB } from '../js/patientDb.js';
+        
+            document.getElementById('patientLoginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+        
+                // Get form values
+                const firstNameInput = document.getElementById('firstName').value.trim();
+                const lastNameInput = document.getElementById('lastName').value.trim();
+                const birthdate = document.getElementById('birthdate').value.trim();
+                const middleName = document.getElementById('middleName').value.trim();
+                const sex = document.getElementById('sex').value;
+                const address = document.getElementById('address').value.trim();
+                const mobileNumber = document.getElementById('mobileNumber').value.trim();
+                const emailAddress = document.getElementById('emailAddress').value.trim();
+        
+                // Use lowercased values for comparison only
+                const firstNameLower = firstNameInput.toLowerCase();
+                const lastNameLower = lastNameInput.toLowerCase();
+        
+                // Check if patient is already registered
+                const existingPatient = PatientDB.getAll().find(patient =>
+                    patient.name.first.toLowerCase() === firstNameLower &&
+                    patient.name.last.toLowerCase() === lastNameLower &&
+                    patient.birthdate === birthdate
+                );
+        
+                if (existingPatient) {
+                    // Existing patient found
+                    alert('Welcome back! Redirecting to appointment page...');
+                    const params = new URLSearchParams({
+                        firstName: existingPatient.name.first,
+                        lastName: existingPatient.name.last,
+                        patientId: existingPatient.id
+                    });
+                    window.location.href = `patient_appointment.html?${params.toString()}`;
+                } else {
+                    // Validate required fields for new patient registration
+                    if (!firstNameInput || !lastNameInput || !birthdate || !sex || !address || !mobileNumber || !emailAddress) {
+                        alert('Error: Please fill out all fields.');
+                        return;
+                    }
+        
+                    // Register new patient with original input values
+                    const newPatient = {
+                        name: {
+                            first: firstNameInput,
+                            middle: middleName,
+                            last: lastNameInput
+                        },
+                        birthdate,
+                        sex,
+                        address,
+                        mobile: mobileNumber,
+                        email: emailAddress
+                    };
+        
+                    const addedPatient = PatientDB.add(newPatient);
+        
+                    alert('New patient registered! Redirecting to appointment page...');
+                    const params = new URLSearchParams({
+                        firstName: addedPatient.name.first,
+                        lastName: addedPatient.name.last,
+                        patientId: addedPatient.id
+                    });
+                    window.location.href = `patient_appointment.html?${params.toString()}`;
+                }
+            });
+        </script>
     </body>
 </html>

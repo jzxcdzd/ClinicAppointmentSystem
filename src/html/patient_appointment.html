@@ -95,12 +95,13 @@ replace with database code when available
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script type="module">
             import { PhysicianDB } from '../js/physicianDb.js';
-            console.log(PhysicianDB.getAll());
-
+            import { AppointmentDB } from '../js/appointmentsDb.js';
+        
             // Retrieve firstName and lastName from URL query parameters
             const params = new URLSearchParams(window.location.search);
             const firstName = params.get('firstName');
             const lastName = params.get('lastName');
+            const patientId = parseInt(params.get('patientId')); // Get patientId from query params
         
             const greetingElem = document.getElementById('greeting');
             if (firstName && lastName) {
@@ -132,7 +133,7 @@ replace with database code when available
                     scheduleDisplay.textContent = 'Physician not found';
                     return;
                 }
-
+        
                 // Display schedule information
                 let scheduleText = '<strong>Availability:</strong><br>';
                 Object.entries(selectedPhys.schedule).forEach(([day, details]) => {
@@ -151,7 +152,7 @@ replace with database code when available
             appointmentDateInput.min = today;
         
             // Submission handler
-            document.getElementById("appointmentForm").addEventListener("submit", function(event){
+            document.getElementById("appointmentForm").addEventListener("submit", function(event) {
                 event.preventDefault();
         
                 // Retrieve values from the form inputs
@@ -159,28 +160,35 @@ replace with database code when available
                 const chiefConcernInput = document.getElementById('chiefConcern');
         
                 // Validate that all required fields are filled
-                if (!appointmentDateInput.value || !appointmentTimeInput.value || !physicianSelect.value || !chiefConcernInput.value.trim()){
+                if (!appointmentDateInput.value || !appointmentTimeInput.value || !physicianSelect.value || !chiefConcernInput.value.trim()) {
                     alert("Please fill in all fields.");
                     return;
                 }
         
-                // Generate an appointment ID
-                const appointmentID = Date.now();
+                // Create a new appointment object
+                const newAppointment = {
+                    date: appointmentDateInput.value,
+                    time: appointmentTimeInput.value,
+                    patientId: patientId, // Use the patientId from the query params
+                    physicianId: parseInt(physicianSelect.value),
+                    chiefConcern: chiefConcernInput.value.trim(),
+                    notes: "" // Notes can be added later
+                };
         
-                // Retrieve the physician name from the select options
-                const physicianText = physicianSelect.options[physicianSelect.selectedIndex].text;
+                // Add the new appointment to the database
+                const addedAppointment = AppointmentDB.add(newAppointment);
         
-                // Get the table body element and create a new row with the form data
+                // Update the table with the new appointment
                 const tbody = document.querySelector("table.table tbody");
                 const newRow = document.createElement("tr");
                 newRow.innerHTML = `
-                    <td>${appointmentID}</td>
-                    <td>${appointmentDateInput.value}</td>
-                    <td>${appointmentTimeInput.value}</td>
-                    <td>${physicianText}</td>
+                    <td>${addedAppointment.id}</td>
+                    <td>${addedAppointment.date}</td>
+                    <td>${addedAppointment.time}</td>
+                    <td>${PhysicianDB.getById(addedAppointment.physicianId).name}</td>
                     <td>N/A</td>
-                    <td>${chiefConcernInput.value}</td>
-                    <td></td>
+                    <td>${addedAppointment.chiefConcern}</td>
+                    <td>${addedAppointment.notes}</td>
                 `;
                 tbody.appendChild(newRow);
         
@@ -192,7 +200,33 @@ replace with database code when available
                 const appointmentModalEl = document.getElementById("appointmentModal");
                 const modalInstance = bootstrap.Modal.getInstance(appointmentModalEl);
                 modalInstance.hide();
+        
+                alert("Appointment successfully added!");
             });
+        
+            // Load existing appointments for the patient
+            const loadAppointments = () => {
+                const tbody = document.querySelector("table.table tbody");
+                tbody.innerHTML = ""; // Clear existing rows
+        
+                const patientAppointments = AppointmentDB.getByPatientId(patientId);
+                patientAppointments.forEach((appointment) => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${appointment.id}</td>
+                        <td>${appointment.date}</td>
+                        <td>${appointment.time}</td>
+                        <td>${PhysicianDB.getById(appointment.physicianId).name}</td>
+                        <td>N/A</td>
+                        <td>${appointment.chiefConcern}</td>
+                        <td>${appointment.notes}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            };
+        
+            // Load appointments on page load
+            loadAppointments();
         </script>
     </body>
 </html>
