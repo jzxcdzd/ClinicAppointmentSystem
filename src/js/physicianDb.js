@@ -6,7 +6,7 @@ const initialPhysicianData = [
         password: "123",
         name: "Dr. Joshua Algarra",
         specialty: "Cardiology",
-        image: "",
+        image: "../img/dr_algarra.png",
         bio: "Board-certified cardiologist with 10+ years of experience.",
         contact: "0967-420-6969",
         schedule: {
@@ -23,7 +23,7 @@ const initialPhysicianData = [
         password: "123",
         name: "Dr. Bono Macariola",
         specialty: "Pediatrics",
-        image: "",
+        image: "../img/dr_macariola.png",
         bio: "Pediatrician specializing in child development.",
         contact: "0967-420-6969",
         schedule: {
@@ -40,7 +40,7 @@ const initialPhysicianData = [
         password: "123",
         name: "Dr. Ezekiel Santiago",
         specialty: "Neurology",
-        image: "",
+        image: "../img/dr_santiago.png",
         bio: "Neurologist focusing on migraine treatment.",
         contact: "0967-420-6969",
         schedule: {

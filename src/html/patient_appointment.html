@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="../css/index.css">
     </head>
     <body>
+        <!-- Table for appointments -->
         <div class="container mt-4">
             <h1 id="greeting" class="text-center mb-4"></h1>
             <p class="text-center">Your past and upcoming appointments will be displayed here.</p>
@@ -36,6 +37,14 @@
                         <!-- Appointment rows go here -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Physician cards -->
+        <hr>
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Meet Our Physicians</h2>
+            <div class="row" id="physicianCards">
             </div>
         </div>
 
@@ -109,6 +118,8 @@
             const notesInput = document.getElementById("notes");
             const deleteAppointmentButton = document.getElementById("deleteAppointmentButton");
         
+                /*** SIMPLE GREETING TO DISPLAY CURRENT USER ***/
+
             const greetingElement = document.getElementById("greeting");
             const patientId = parseInt(new URLSearchParams(window.location.search).get('patientId'));
             const patient = PatientDB.getById(patientId);
@@ -118,7 +129,36 @@
                 greetingElement.textContent = "Good day!";
             }
 
-            // Function to toggle read-only or disabled state
+                /*** HANDLES PHYSICIAN CARDS ***/
+
+            const physicianCardsContainer = document.getElementById("physicianCards");
+            const physicians = PhysicianDB.getAll();
+            physicians.forEach((physician) => {
+                console.log(physician.image);
+                const card = document.createElement("div");
+                card.className = "col-md-4 mb-3";
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            ${
+                                physician.image
+                                    ? `<img src="${physician.image}" alt="${physician.name}" class="img-fluid mb-3" style="width: 100%; height: auto;">`
+                                    : `<div class="image-placeholder mb-3" style="width: 100%; height: 400px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: #aaa;">Image Placeholder</span>
+                                    </div>`
+                            }
+                            <h5 class="card-title">${physician.name}</h5>
+                            <p class="card-text"><strong>Specialty:</strong> ${physician.specialty}</p>
+                            <p class="card-text"><strong>Contact:</strong> ${physician.contact}</p>
+                            <p class="card-text"><strong>Bio:</strong> ${physician.bio}</p>
+                        </div>
+                    </div>
+                `;
+                physicianCardsContainer.appendChild(card);
+            });
+
+                /*** HANDLES MODAL FORMATTING ***/
+
             const setModalReadOnly = (isReadOnly, writableFields = []) => {
                 const allFields = [appointmentDateInput, appointmentTimeInput, physicianSelect, physicianContact,  chiefConcernInput, notesInput];
                 allFields.forEach((field) => {
@@ -132,7 +172,6 @@
                 });
             };
         
-            // Populate physician dropdown
             physicianSelect.innerHTML = '<option selected value="">Choose...</option>';
             PhysicianDB.getAll().forEach((phys) => {
                 const option = document.createElement('option');
@@ -141,7 +180,6 @@
                 physicianSelect.appendChild(option);
             });
         
-            // Display schedule for selected physician
             physicianSelect.addEventListener('change', function () {
                 const selectedPhys = PhysicianDB.getById(parseInt(this.value));
                 if (!selectedPhys) {
@@ -159,11 +197,11 @@
                 scheduleDisplay.innerHTML = scheduleText;
             });
         
-            // Limit dates to today and future dates
             const today = new Date().toISOString().split("T")[0];
             appointmentDateInput.min = today;
         
-            // Handle form submission for adding or editing
+                /*** HANDLES MODAL SUBMIT BUTTON ***/
+
             appointmentForm.addEventListener("submit", function (event) {
                 event.preventDefault();
         
@@ -219,7 +257,8 @@
                 modalInstance.hide();
             });
         
-            // Handle "Request for an Appointment" button click
+                /*** HANDLES NEW APPOINTMENT BUTTON CLICK ***/
+
             const requestAppointmentButton = document.querySelector('[data-bs-target="#appointmentModal"]');
             requestAppointmentButton.addEventListener("click", () => {
                 document.getElementById("appointmentId").value = "";
@@ -235,7 +274,8 @@
                 setModalReadOnly(true, [appointmentDateInput, appointmentTimeInput, physicianSelect, chiefConcernInput]);
             });
         
-            // Load appointments into the table
+                /*** HANDLES APPOINTMENT TABLE ***/
+
             const loadAppointments = () => {
                 const tbody = document.querySelector("table.table tbody");
                 tbody.innerHTML = "";
