@@ -618,6 +618,9 @@
         const physicianId = parseInt(physicianSelect.value);
         const chiefConcern = chiefConcernInput.value.trim();
         const notes = notesInput.value.trim();
+        const patientId = parseInt(
+          new URLSearchParams(window.location.search).get("patientId")
+        );
 
         if (
           !appointmentDate ||
@@ -626,6 +629,23 @@
           !chiefConcern
         ) {
           alert("Please fill in all required fields.");
+          return;
+        }
+
+        // Check for conflicting appointments
+        const existingAppointments = AppointmentDB.getByPatientId(
+          patientId
+        ).filter(
+          (appointment) =>
+            appointment.date === appointmentDate &&
+            appointment.time === appointmentTime &&
+            appointment.id !== parseInt(appointmentId) // Exclude the current appointment if editing
+        );
+
+        if (existingAppointments.length > 0) {
+          alert(
+            "You already have an appointment scheduled at this time. Please choose a different time."
+          );
           return;
         }
 
@@ -655,33 +675,15 @@
           const newAppointment = {
             date: appointmentDate,
             time: appointmentTime,
-            patientId: parseInt(
-              new URLSearchParams(window.location.search).get("patientId")
-            ),
+            patientId: patientId,
             physicianId: physicianId,
             chiefConcern: chiefConcern,
             notes: notes,
           };
           AppointmentDB.add(newAppointment);
           alert("Appointment added successfully!");
+          location.reload();
         }
-
-        // Reload appointments and close the modal
-        loadAppointments();
-
-        // Properly hide the modal and remove the backdrop
-        const modalElement = document.getElementById("appointmentModal");
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-
-        // Ensure the backdrop is removed
-        document
-          .querySelectorAll(".modal-backdrop")
-          .forEach((backdrop) => backdrop.remove());
-        document.body.classList.remove("modal-open");
-        document.body.style = ""; // Reset body styles
       });
 
       /*** HANDLES NEW APPOINTMENT BUTTON CLICK ***/

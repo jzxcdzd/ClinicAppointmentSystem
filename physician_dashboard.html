@@ -584,6 +584,23 @@
           return;
         }
 
+        // Check for conflicting appointments
+        const existingAppointments = AppointmentDB.getByPatientId(
+          patientId
+        ).filter(
+          (appointment) =>
+            appointment.date === appointmentDate &&
+            appointment.time === appointmentTime &&
+            appointment.id !== parseInt(appointmentId) // Exclude the current appointment if editing
+        );
+
+        if (existingAppointments.length > 0) {
+          alert(
+            "This patient already has an appointment scheduled at this time. Please choose a different time."
+          );
+          return;
+        }
+
         if (appointmentId) {
           // Edit existing appointment
           const appointment = AppointmentDB.getById(parseInt(appointmentId));
@@ -607,13 +624,7 @@
               // Debug: Check if the event exists in the calendar
               const oldEvent = calendar.getEventById(appointment.id);
               if (oldEvent) {
-                console.log("Old event found:", oldEvent);
                 oldEvent.remove(); // Remove the old event
-              } else {
-                console.warn(
-                  "Old event not found in the calendar for id:",
-                  appointment.id
-                );
               }
 
               // Add the updated event to the calendar
