@@ -723,11 +723,8 @@
               if (confirmDelete) {
                 AppointmentDB.delete(appointment.id);
                 alert("Appointment deleted successfully!");
-                loadAppointments();
-                const modalInstance = bootstrap.Modal.getInstance(
-                  document.getElementById("appointmentModal")
-                );
-                modalInstance.hide();
+
+                location.reload();
               }
             };
 
