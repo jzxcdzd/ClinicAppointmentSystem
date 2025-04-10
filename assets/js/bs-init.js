@@ -25,4 +25,13 @@ document.addEventListener("DOMContentLoaded", function () {
       element.classList.remove("animate__animated", `animate__${animation}`);
     });
   });
+
+  element.addEventListener("mouseenter", function () {
+    var animation = element.getAttribute("data-bss-hover-animate");
+    element.classList.add("animated", animation);
+  });
+  element.addEventListener("mouseleave", function () {
+    var animation = element.getAttribute("data-bss-hover-animate");
+    element.classList.remove("animated", animation);
+  });
 });

@@ -22,6 +22,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <link rel="stylesheet" href="assets/css/animate.min.css" />
   </head>
 
   <body>
@@ -467,26 +468,13 @@
       document.addEventListener("DOMContentLoaded", function () {
         const calendarEl = document.getElementById("appointmentCalendar");
 
-        const appointments = AppointmentDB.getAll(); // Fetch all appointments from localStorage
-
-        // Map appointments to FullCalendar events
-        const events = appointments.map((appointment) => ({
-          title: appointment.time, // Display the time of the appointment
-          start: `${appointment.date}T${appointment.time}`, // Combine date and time
-          allDay: false, // Ensure it's not an all-day event
-        }));
-
+        // Initialize the calendar
         calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: "dayGridMonth", // Month view
-          events: events, // Load events into the calendar
           headerToolbar: {
             left: "prev,next", // Navigation buttons
             center: "title", // Show the month title
             right: "", // No additional views
-          },
-          eventClick: function () {
-            // Disable click functionality
-            return false;
           },
           selectable: false, // Disable selection
           editable: false, // Disable editing
@@ -496,6 +484,29 @@
           contentHeight: "auto", // Dynamically adjust the calendar height
         });
 
+        // Synchronize the calendar with the database
+        const syncCalendarWithDatabase = () => {
+          // Clear all existing events from the calendar
+          calendar.getEvents().forEach((event) => event.remove());
+
+          // Fetch all appointments from the database
+          const appointments = AppointmentDB.getByPhysicianId(physicianId);
+
+          // Add each appointment as an event in the calendar
+          appointments.forEach((appointment) => {
+            calendar.addEvent({
+              id: String(appointment.id), // Ensure the ID is consistent
+              title: appointment.time,
+              start: `${appointment.date}T${appointment.time}`,
+              allDay: false,
+            });
+          });
+        };
+
+        // Call the synchronization function
+        syncCalendarWithDatabase();
+
+        // Render the calendar
         calendar.render();
       });
 
@@ -534,6 +545,7 @@
           document.getElementById("patientName").value = "";
           document.getElementById("patientContact").value = "";
           alert("Patient not found.");
+          document.getElementById("patientId").value = ""; // Clear the patientId field
         }
       });
 
@@ -550,6 +562,7 @@
         const chiefConcern = chiefConcernInput.value.trim();
         const notes = notesInput.value.trim();
 
+        // Validate required fields
         if (
           !appointmentDate ||
           !appointmentTime ||
@@ -560,12 +573,23 @@
           return;
         }
 
+        // Check if the selected date and time are valid
+        const now = new Date();
+        const selectedDateTime = new Date(
+          `${appointmentDate}T${appointmentTime}`
+        );
+
+        if (selectedDateTime < now) {
+          alert("You cannot select a time that has already passed.");
+          return;
+        }
+
         if (appointmentId) {
           // Edit existing appointment
           const appointment = AppointmentDB.getById(parseInt(appointmentId));
           if (appointment) {
             const updatedAppointment = {
-              id: appointment.id,
+              id: appointment.id, // Ensure the id remains consistent
               date: appointmentDate,
               time: appointmentTime,
               patientId: patientId,
@@ -579,12 +603,26 @@
             );
             if (updated) {
               alert("Appointment updated successfully!");
-              // Update the calendar event
-              const event = calendar.getEventById(appointment.id);
-              if (event) {
-                event.setStart(`${appointmentDate}T${appointmentTime}`);
-                event.setProp("title", appointmentTime);
+
+              // Debug: Check if the event exists in the calendar
+              const oldEvent = calendar.getEventById(appointment.id);
+              if (oldEvent) {
+                console.log("Old event found:", oldEvent);
+                oldEvent.remove(); // Remove the old event
+              } else {
+                console.warn(
+                  "Old event not found in the calendar for id:",
+                  appointment.id
+                );
               }
+
+              // Add the updated event to the calendar
+              calendar.addEvent({
+                id: updatedAppointment.id, // Use the same id
+                title: updatedAppointment.time,
+                start: `${updatedAppointment.date}T${updatedAppointment.time}`,
+                allDay: false,
+              });
             } else {
               alert("Failed to update appointment.");
             }
@@ -674,6 +712,10 @@
 
             deleteAppointmentButton.style.display = "block";
             setupEditMode(true);
+
+            // Trigger the change event for the date input to populate the time dropdown
+            appointmentDateInput.dispatchEvent(new Event("change"));
+
             deleteAppointmentButton.onclick = () => {
               const confirmDelete = confirm(
                 "Are you sure you want to delete this appointment?"
